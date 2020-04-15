@@ -11,7 +11,7 @@ class LoadMore extends StatefulWidget {
   static DelegateBuilder<LoadMoreDelegate> buildDelegate =
       () => DefaultLoadMoreDelegate();
   static DelegateBuilder<LoadMoreTextBuilder> buildTextBuilder =
-      () => DefaultLoadMoreTextBuilder.chinese;
+      () => DefaultLoadMoreTextBuilder.english;
 
   /// Only support [ListView],[SliverList]
   final Widget child;
@@ -369,7 +369,7 @@ abstract class LoadMoreDelegate {
   Duration loadMoreDelay() => Duration(milliseconds: _loadMoreDelay);
 
   Widget buildChild(LoadMoreStatus status,
-      {LoadMoreTextBuilder builder = DefaultLoadMoreTextBuilder.chinese});
+      {LoadMoreTextBuilder builder = DefaultLoadMoreTextBuilder.english});
 }
 
 class DefaultLoadMoreDelegate extends LoadMoreDelegate {
@@ -377,15 +377,15 @@ class DefaultLoadMoreDelegate extends LoadMoreDelegate {
 
   @override
   Widget buildChild(LoadMoreStatus status,
-      {LoadMoreTextBuilder builder = DefaultLoadMoreTextBuilder.chinese}) {
-    String text = builder(status);
+      {LoadMoreTextBuilder builder = DefaultLoadMoreTextBuilder.english}) {
+    Widget widget = builder(status);
     if (status == LoadMoreStatus.fail) {
       return Container(
-        child: Text(text),
+        child: widget,
       );
     }
     if (status == LoadMoreStatus.idle) {
-      return Text(text);
+      return widget;
     }
     if (status == LoadMoreStatus.loading) {
       return Container(
@@ -397,71 +397,47 @@ class DefaultLoadMoreDelegate extends LoadMoreDelegate {
               width: _loadmoreIndicatorSize,
               height: _loadmoreIndicatorSize,
               child: CircularProgressIndicator(
-                backgroundColor: Colors.blue,
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(text),
+              child: widget,
             ),
           ],
         ),
       );
     }
     if (status == LoadMoreStatus.nomore) {
-      return Text(text);
+      return widget;
     }
 
-    return Text(text);
+    return widget;
   }
 }
 
-typedef String LoadMoreTextBuilder(LoadMoreStatus status);
+typedef Widget LoadMoreTextBuilder(LoadMoreStatus status);
 
-String _buildChineseText(LoadMoreStatus status) {
-  String text;
+Widget _buildEnglishText(LoadMoreStatus status) {
+  Widget text;
   switch (status) {
     case LoadMoreStatus.fail:
-      text = "加载失败，请点击重试";
+      text = Text("load fail, tap to retry");
       break;
     case LoadMoreStatus.idle:
-      text = "等待加载更多";
+      text = Text("wait for loading");
       break;
     case LoadMoreStatus.loading:
-      text = "加载中，请稍候...";
+      text = Text("loading, wait for moment ...");
       break;
     case LoadMoreStatus.nomore:
-      text = "到底了，别扯了";
+      text = Text("no more data");
       break;
     default:
-      text = "";
-  }
-  return text;
-}
-
-String _buildEnglishText(LoadMoreStatus status) {
-  String text;
-  switch (status) {
-    case LoadMoreStatus.fail:
-      text = "load fail, tap to retry";
-      break;
-    case LoadMoreStatus.idle:
-      text = "wait for loading";
-      break;
-    case LoadMoreStatus.loading:
-      text = "loading, wait for moment ...";
-      break;
-    case LoadMoreStatus.nomore:
-      text = "no more data";
-      break;
-    default:
-      text = "";
+      text = Text("");
   }
   return text;
 }
 
 class DefaultLoadMoreTextBuilder {
-  static const LoadMoreTextBuilder chinese = _buildChineseText;
-
   static const LoadMoreTextBuilder english = _buildEnglishText;
 }
